@@ -6,7 +6,7 @@ from tkinter import ttk
 
 matplotlib.use("TkAgg")
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
 root = tk.Tk()
@@ -245,10 +245,10 @@ class normaltab_plot(ttk.Frame):
         self.a.plot(xvalues,yvalues)
 
         self.canvas = FigureCanvasTkAgg(f, self)
-        self.canvas.show()
+        self.canvas.draw()
         self.canvas.get_tk_widget().pack()
 
-        toolbar = NavigationToolbar2TkAgg(self.canvas, self)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
         toolbar.update()
         self.canvas._tkcanvas.pack()
 
@@ -275,7 +275,7 @@ class normaltab_plot(ttk.Frame):
 
         self.a.cla()
         self.a.plot(xvalues,yvalues)
-        self.canvas.show()        
+        self.canvas.draw()        
 
 class introductory_tab(ttk.Frame):
 
