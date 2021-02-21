@@ -75,6 +75,28 @@ class InputFrame(ttk.Labelframe):
                                    ttk.Entry(self.introductory_rate_labelframe,
                                              )
         self.introductory_rate_entry.grid(row = 1, column = 1)
+        # Overpayment
+        self.overpayment_labelframe_label_widget = ttk.Frame(self)
+        self.overpayment_label =\
+                            ttk.Label(self.overpayment_labelframe_label_widget,
+                                      text = "Overpayment")
+        self.overpayment_label.grid(row = 0, column = 0)
+        self.overpayment_checkbutton =\
+                      ttk.Checkbutton(self.overpayment_labelframe_label_widget,
+                                      )
+        self.overpayment_checkbutton.grid(row = 0, column = 1)
+        self.overpayment_labelframe = ttk.Labelframe(self,
+                        labelwidget = self.overpayment_labelframe_label_widget)
+        self.overpayment_labelframe.grid(row = 0, column = 3, sticky = "ns",
+                                         rowspan = "3")
+        self.overpayment_label = ttk.Label(self.overpayment_labelframe,
+                                           text = "Overpayment Amount")
+        self.overpayment_label.grid(row = 0, column = 0)
+        self.overpayment_entry = ttk.Entry(self.overpayment_labelframe)
+        self.overpayment_entry.grid(row = 1, column = 0)
+        # Calculate Button
+        self.calculate_button = ttk.Button(self, text = "Calculate")
+        self.calculate_button.grid(row = 3, column = 3)
 
 
 class ResultsFrame(ttk.Frame):
