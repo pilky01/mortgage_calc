@@ -95,8 +95,14 @@ class InputFrame(ttk.Labelframe):
         self.overpayment_entry = ttk.Entry(self.overpayment_labelframe)
         self.overpayment_entry.grid(row = 1, column = 0)
         # Calculate Button
-        self.calculate_button = ttk.Button(self, text = "Calculate")
+        self.calculate_button =\
+                    ttk.Button(self, text = "Calculate",
+                               command = lambda: self.calculate_button_click())
         self.calculate_button.grid(row = 3, column = 3)
+    
+    def calculate_button_click(self):
+#        mainApplication.results_frame
+        pass
 
 
 class ResultsFrame(ttk.Frame):
