@@ -2,6 +2,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
+import numpy_financial as npf
 
 import mortgage_functions as mfunc
 
@@ -101,8 +102,31 @@ class InputFrame(ttk.Labelframe):
         self.calculate_button.grid(row = 3, column = 3)
     
     def calculate_button_click(self):
-#        mainApplication.results_frame
-        pass
+#       Define input variables
+        principal = float(self.principal_entry.get())
+        monthly_interest = (float(self.interest_entry.get()))/1200
+        term = float(self.term_entry.get())*12# Months
+#       monthly_payment
+        payment = npf.pmt(monthly_interest, term, principal)
+        self.master.results_frame.monthly_payment_var.set(payment*-1)
+#       total amount payable
+        total_amount_payable = payment*-1*term
+        self.master.results_frame.total_amount_var.set(total_amount_payable)
+#       total interest paid
+        total_interest = total_amount_payable - principal
+        self.master.results_frame.total_interest_var.set(total_interest)
+#       borrowing factor
+        borrowing_factor = total_amount_payable / principal
+        self.master.results_frame.borrowing_factor_var.set(borrowing_factor)
+#       Future value boxes enable
+        future_value_entries = [
+                      self.master.results_frame.remaining_balance_years_entry,
+                      self.master.results_frame.remaining_balance_months_entry
+                      ]
+        for entry in future_value_entries:
+            if str(entry['state']) == "disabled":
+                entry.configure(state = 'normal')
+                entry.insert(0, 0)
 
 
 class ResultsFrame(ttk.Frame):
@@ -110,12 +134,12 @@ class ResultsFrame(ttk.Frame):
     def __init__(self, master = None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.create_results()
+        self.event_bindings()
     
     def create_results(self):
         # Monthly Payment
         self.monthly_payment_label = ttk.Label(self,
-                                               text = "Monthly Payment (£)",
-                                               )
+                                               text = "Monthly Payment (£)")
         self.monthly_payment_label.grid(row = 0, column = 0)
         self.monthly_payment_var = tk.DoubleVar(self)
         self.monthly_payment_result = ttk.Label(self,
@@ -158,7 +182,8 @@ class ResultsFrame(ttk.Frame):
         
         self.remaining_balance_years_entry =\
                                         ttk.Entry(self.remaining_balance_frame,
-                                                  width = 3)
+                                                  width = 3,
+                                                  state = "disabled")
         self.remaining_balance_years_entry.grid(row = 0, column = 1)
         
         self.remaining_balance_years_label =\
@@ -167,7 +192,8 @@ class ResultsFrame(ttk.Frame):
         
         self.remaining_balance_months_entry =\
                                         ttk.Entry(self.remaining_balance_frame,
-                                                  width = 3)
+                                                  width = 3,
+                                                  state = "disabled")
         self.remaining_balance_months_entry.grid(row = 0, column = 3)
         
         self.remaining_balance_months_label =\
@@ -181,6 +207,39 @@ class ResultsFrame(ttk.Frame):
         self.remaining_balance_var = tk.DoubleVar()
         self.remaining_balance_result = ttk.Label(self,
                                      textvariable = self.remaining_balance_var)
+        self.remaining_balance_result.grid(row = 10, column = 0)
+    
+    def event_bindings(self):
+        future_value_entries = [
+                                self.remaining_balance_years_entry,
+                                self.remaining_balance_months_entry
+                                ]
+        for entry in future_value_entries:
+            entry.bind('<FocusOut>',
+               lambda event, entry = entry: self.future_value_focus_out(entry))
+    
+    def future_value_focus_out(self, entry):
+        if entry.get() == '':
+            entry.insert(0, 0)
+        self.remaining_balance_calculation()
+    
+    def remaining_balance_calculation(self):
+        try:
+            principal = float(self.master.input_frame.principal_entry.get())
+            monthly_interest =\
+                     (float(self.master.input_frame.interest_entry.get()))/1200
+            term = float(self.master.input_frame.term_entry.get())*12# Months
+            payment = npf.pmt(monthly_interest, term, principal)
+            
+            future_term_years = int(self.remaining_balance_years_entry.get())
+            future_term_months = int(self.remaining_balance_months_entry.get())
+            future_term = future_term_years*12 + future_term_months
+            
+            future_value =\
+                      npf.fv(monthly_interest, future_term, payment, principal)
+            self.remaining_balance_var.set(future_value)
+        except ValueError:
+            pass
 
 
 class DataFrame(ttk.Notebook):
