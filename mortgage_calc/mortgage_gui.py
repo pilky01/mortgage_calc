@@ -17,9 +17,10 @@ class Application(ttk.Frame):
         self.input_frame.grid(row = 0, column = 0, columnspan = "2",
                               sticky = "ew")
         self.results_frame = ResultsFrame(self)
-        self.results_frame.grid(row = 1, column = 0)
+        self.results_frame.grid(row = 1, column = 0, sticky = "nsew")
+        self.results_frame.grid_columnconfigure(0, weight = 1)
         self.data_frame = DataFrame(self)
-        self.data_frame.grid(row = 1, column = 1)
+        self.data_frame.grid(row = 1, column = 1, sticky = "nsew")
 
 
 class InputFrame(ttk.Labelframe):
@@ -106,18 +107,22 @@ class InputFrame(ttk.Labelframe):
         principal = float(self.principal_entry.get())
         monthly_interest = (float(self.interest_entry.get()))/1200
         term = float(self.term_entry.get())*12# Months
-#       monthly_payment
+#       Monthly_payment
         payment = npf.pmt(monthly_interest, term, principal)
-        self.master.results_frame.monthly_payment_var.set(payment*-1)
-#       total amount payable
+        self.master.results_frame.monthly_payment_result.config(
+                                                 text = f'£ {payment*-1:,.2f}')
+#       Total amount payable
         total_amount_payable = payment*-1*term
-        self.master.results_frame.total_amount_var.set(total_amount_payable)
-#       total interest paid
+        self.master.results_frame.total_amount_result.config(
+                                       text = f'£ {total_amount_payable:,.2f}')
+#       Total interest paid
         total_interest = total_amount_payable - principal
-        self.master.results_frame.total_interest_var.set(total_interest)
-#       borrowing factor
+        self.master.results_frame.total_interest_result.config(
+                                             text = f'£ {total_interest:,.2f}')
+#       Borrowing factor
         borrowing_factor = total_amount_payable / principal
-        self.master.results_frame.borrowing_factor_var.set(borrowing_factor)
+        self.master.results_frame.borrowing_factor_result.config(
+                                           text = f'£ {borrowing_factor:,.3f}')
 #       Future value boxes enable
         future_value_entries = [
                       self.master.results_frame.remaining_balance_years_entry,
@@ -137,47 +142,37 @@ class ResultsFrame(ttk.Frame):
         self.event_bindings()
     
     def create_results(self):
-        # Monthly Payment
-        self.monthly_payment_label = ttk.Label(self,
-                                               text = "Monthly Payment (£)")
-        self.monthly_payment_label.grid(row = 0, column = 0)
-        self.monthly_payment_var = tk.DoubleVar(self)
-        self.monthly_payment_result = ttk.Label(self,
-                                       textvariable = self.monthly_payment_var)
-        self.monthly_payment_result.grid(row = 1, column = 0)
-        # Total Amount
-        self.total_amount_label = ttk.Label(self,
-                                            text = "Total Amount Payable (£)",
-                                           )
-        self.total_amount_label.grid(row = 2, column = 0)
-        self.total_amount_var = tk.DoubleVar(self)
-        self.total_amount_result = ttk.Label(self,
-                                          textvariable = self.total_amount_var)
-        self.total_amount_result.grid(row = 3, column = 0)
-        # Total Interest
-        self.total_interest_label = ttk.Label(self,
-                                              text = "Total Interest Paid (£)",
-                                              )
-        self.total_interest_label.grid(row = 4, column = 0)
-        self.total_interest_var = tk.DoubleVar(self)
-        self.total_interest_result = ttk.Label(self,
-                                        textvariable = self.total_interest_var)
-        self.total_interest_result.grid(row = 5, column = 0)
-        # Borrowing Factor
-        self.borrowing_factor_label = ttk.Label(self,
-                                     text = "For each £ borrowed, you pay (£)",
-                                     )
-        self.borrowing_factor_label.grid(row = 6, column = 0)
-        self.borrowing_factor_var = tk.DoubleVar(self)
-        self.borrowing_factor_result = ttk.Label(self,
-                                      textvariable = self.borrowing_factor_var)
-        self.borrowing_factor_result.grid(row = 7, column = 0)
-        # Remaining Balance
+#       Monthly Payment
+        self.monthly_payment_label = ttk.Label(self, text = "Monthly Payment",
+                                               anchor = "w")
+        self.monthly_payment_label.grid(row = 0, column = 0, sticky = "w")
+        self.monthly_payment_result = ttk.Label(self, anchor = "center")
+        self.monthly_payment_result.grid(row = 1, column = 0, sticky = "ew")
+#       Total Amount
+        self.total_amount_label = ttk.Label(self, anchor = "w",
+                                            text = "Total Amount Payable")
+        self.total_amount_label.grid(row = 2, column = 0, sticky = "w")
+        self.total_amount_result = ttk.Label(self, anchor = "center")
+        self.total_amount_result.grid(row = 3, column = 0, sticky = "ew")
+#       Total Interest
+        self.total_interest_label = ttk.Label(self, anchor = "w",
+                                              text = "Total Interest Paid")
+        self.total_interest_label.grid(row = 4, column = 0, sticky = "w")
+        self.total_interest_result = ttk.Label(self, anchor = "center")
+        self.total_interest_result.grid(row = 5, column = 0, sticky = "ew")
+#       Borrowing Factor
+        self.borrowing_factor_label = ttk.Label(self, anchor = "w",
+                                         text = "For each £ borrowed, you pay")
+        self.borrowing_factor_label.grid(row = 6, column = 0, sticky = "w")
+        self.borrowing_factor_result = ttk.Label(self, anchor = "center")
+        self.borrowing_factor_result.grid(row = 7, column = 0, sticky = "ew")
+#       Remaining Balance
         self.remaining_balance_frame = ttk.Frame(self)
-        self.remaining_balance_frame.grid(row = 8, column = 0)
+        self.remaining_balance_frame.grid(row = 8, column = 0, sticky = "ew")
         
         self.remaining_balance_after_label =\
-                        ttk.Label(self.remaining_balance_frame, text = "After")
+                        ttk.Label(self.remaining_balance_frame, text = "After",
+                                  anchor = "w")
         self.remaining_balance_after_label.grid(row = 0, column = 0)
         
 #       Entry validation
@@ -209,13 +204,11 @@ class ResultsFrame(ttk.Frame):
                                                   text = "months")
         self.remaining_balance_months_label.grid(row = 0, column = 4)
         
-        self.remaining_balance_label = ttk.Label(self,
+        self.remaining_balance_label = ttk.Label(self, anchor = "w",
                                                  text = "the amount owed is")
-        self.remaining_balance_label.grid(row = 9, column = 0)
-        self.remaining_balance_var = tk.DoubleVar()
-        self.remaining_balance_result = ttk.Label(self,
-                                     textvariable = self.remaining_balance_var)
-        self.remaining_balance_result.grid(row = 10, column = 0)
+        self.remaining_balance_label.grid(row = 9, column = 0, sticky = "w")
+        self.remaining_balance_result = ttk.Label(self, anchor = "center")
+        self.remaining_balance_result.grid(row = 10, column = 0, stick = "ew")
     
     def event_bindings(self):
         future_value_entries = [
@@ -245,7 +238,8 @@ class ResultsFrame(ttk.Frame):
             
             future_value =\
                       npf.fv(monthly_interest, future_term, payment, principal)
-            self.remaining_balance_var.set(future_value)
+            self.remaining_balance_result.config(
+                                            text = f'£ {future_value*-1:,.2f}')
         except ValueError:
             pass
     
