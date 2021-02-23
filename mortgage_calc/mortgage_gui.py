@@ -180,20 +180,28 @@ class ResultsFrame(ttk.Frame):
                         ttk.Label(self.remaining_balance_frame, text = "After")
         self.remaining_balance_after_label.grid(row = 0, column = 0)
         
+#       Entry validation
+        self.vcmd_years =\
+                       self.register(self.forward_value_years_entry_validation)
         self.remaining_balance_years_entry =\
-                                        ttk.Entry(self.remaining_balance_frame,
-                                                  width = 3,
-                                                  state = "disabled")
+                           ttk.Entry(self.remaining_balance_frame,
+                                     width = 3, state = "disabled",
+                                     validate = 'all',
+                                     validatecommand = (self.vcmd_years, '%P'))
         self.remaining_balance_years_entry.grid(row = 0, column = 1)
         
         self.remaining_balance_years_label =\
                     ttk.Label(self.remaining_balance_frame, text = "years and")
         self.remaining_balance_years_label.grid(row = 0, column = 2)
         
+#       Entry validation
+        self.vcmd_months =\
+                      self.register(self.forward_value_months_entry_validation)
         self.remaining_balance_months_entry =\
-                                        ttk.Entry(self.remaining_balance_frame,
-                                                  width = 3,
-                                                  state = "disabled")
+                          ttk.Entry(self.remaining_balance_frame,
+                                    width = 3, state = "disabled",
+                                    validate = 'all',
+                                    validatecommand = (self.vcmd_months, '%P'))
         self.remaining_balance_months_entry.grid(row = 0, column = 3)
         
         self.remaining_balance_months_label =\
@@ -240,6 +248,20 @@ class ResultsFrame(ttk.Frame):
             self.remaining_balance_var.set(future_value)
         except ValueError:
             pass
+    
+    def forward_value_years_entry_validation(self, P):
+        if str.isdigit(P)\
+        and 0 <= int(P) < int(self.master.input_frame.term_entry.get())\
+        or P == "":
+            return True
+        else:
+            return False
+    
+    def forward_value_months_entry_validation(self, P):
+        if str.isdigit(P) and 0 <= int(P) <=11 or P == "":
+            return True
+        else:
+            return False
 
 
 class DataFrame(ttk.Notebook):
